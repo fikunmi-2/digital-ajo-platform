@@ -103,3 +103,66 @@ class SavingsPackage(models.Model):
 
     def __str__(self):
         return self.name
+
+class CustomerPackage(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+
+    tenant = models.ForeignKey(
+        "tenants.Tenant",
+        on_delete=models.CASCADE,
+        related_name="customer_packages"
+    )
+
+    customer = models.ForeignKey(
+        "customers.Customer",
+        on_delete=models.CASCADE,
+        related_name="packages"
+    )
+
+    savings_package = models.ForeignKey(
+        "services.SavingsPackage",
+        on_delete=models.CASCADE,
+        related_name="customer_packages"
+    )
+
+    class Status(models.TextChoices):
+        ACTIVE = "active", "Active"
+        COMPLETED = "completed", "Completed"
+        CANCELLED = "cancelled", "Cancelled"
+        DEFAULTED = "defaulted", "Defaulted"
+
+    status = models.CharField(
+        max_length=20,
+        choices=Status.choices,
+        default=Status.ACTIVE
+    )
+
+    custom_contribution_amount = models.DecimalField(
+        max_digits=12,
+        decimal_places=2,
+        null=True,
+        blank=True
+    )
+
+    start_date = models.DateTimeField()
+    end_date = models.DateTimeField(null=True, blank=True)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["customer", "savings_package"],
+                name="unique_customer_savings_package"
+            )
+        ]
+        indexes = [
+            models.Index(fields=["tenant"]),
+            models.Index(fields=["customer"]),
+            models.Index(fields=["savings_package"]),
+            models.Index(fields=["status"]),
+        ]
+
+    def __str__(self):
+        return f"{self.customer} - {self.savings_package}"
