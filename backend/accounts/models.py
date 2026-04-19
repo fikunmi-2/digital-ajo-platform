@@ -8,22 +8,24 @@ from django.db import models
 class User(AbstractUser):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
-    ROLE_CHOICES = (
-        ("tenant_admin", "Tenant Admin"),
-        ("customer", "Customer"),
-        ("agent", "Agent")
-    )
-
     tenant = models.ForeignKey(
-        "Tenant",
+        "tenant.Tenant",
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
         related_name="users"
     )
 
+    class Role(models.TextChoices):
+        TENANT_ADMIN = "tenant_admin", "Tenant Admin"
+        CUSTOMER = "customer", "Customer"
+        AGENT = "agent", "Agent"
 
-    role = models.CharField(max_length=20, choices=ROLE_CHOICES)
+    role = models.CharField(
+        max_length=20,
+        choices=Role.choices,
+        default=Role.CUSTOMER
+    )
 
     username = None
     email = models.EmailField(unique=True)
@@ -46,32 +48,3 @@ class User(AbstractUser):
 
     def __str__(self):
         return self.email
-
-
-
-class Tenant(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-
-    name = models.CharField(max_length=255)
-    slug = models.SlugField(unique=True)
-    email = models.EmailField()
-    phone = models.CharField(max_length=20)
-    logo = models.ImageField(upload_to="tenant_logos/", null=True, blank=True)
-
-    STATUS_CHOICES = (
-        ("active", "Active"),
-        ("inactive", "Inactive"),
-        ("suspended", "Suspended")
-    )
-
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="active")
-    created_by = models.ForeignKey("User",
-                                   null=True,
-                                   blank=True,
-                                   on_delete=models.SET_NULL,
-                                   related_name="created_tenants")
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    def __str__(self):
-        return self.name
