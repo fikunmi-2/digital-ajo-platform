@@ -9,7 +9,7 @@ class User(AbstractUser):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
     tenant = models.ForeignKey(
-        "tenant.Tenant",
+        "tenants.Tenant",
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
