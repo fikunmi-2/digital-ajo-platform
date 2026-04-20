@@ -250,3 +250,72 @@ class ContributionRequest(models.Model):
     def __str__(self):
         return f"{self.customer} - {self.amount}"
 
+class WithdrawalRequest(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+
+    tenant = models.ForeignKey(
+        "tenants.Tenant",
+        on_delete=models.CASCADE,
+        related_name="withdrawal_requests"
+    )
+
+    customer = models.ForeignKey(
+        "customers.Customer",
+        on_delete=models.CASCADE,
+        related_name="withdrawals"
+    )
+
+    customer_package = models.ForeignKey(
+        "services.CustomerPackage",
+        on_delete=models.CASCADE,
+        related_name="withdrawals"
+    )
+
+    amount = models.DecimalField(max_digits=12, decimal_places=2)
+
+    class Status(models.TextChoices):
+        PENDING = "pending", "Pending"
+        APPROVED = "approved", "Approved"
+        REJECTED = "rejected", "Rejected"
+        CANCELLED = "cancelled", "Cancelled"
+
+    status = models.CharField(
+        max_length=20,
+        choices=Status.choices,
+        default=Status.PENDING
+    )
+
+    reference = models.CharField(max_length=100, unique=True)
+
+    requested_by = models.ForeignKey(
+        "accounts.User",
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name="requested_withdrawals"
+    )
+
+    processed_by = models.ForeignKey(
+        "accounts.User",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="processed_withdrawals"
+    )
+
+    notes = models.TextField(blank=True, null=True)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    processed_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=["tenant"]),
+            models.Index(fields=["customer"]),
+            models.Index(fields=["customer_package"]),
+            models.Index(fields=["status"]),
+            models.Index(fields=["reference"]),
+            models.Index(fields=["tenant", "status"]),
+        ]
+
+    def __str__(self):
+        return f"{self.customer} - {self.amount}"
