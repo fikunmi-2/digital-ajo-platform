@@ -166,3 +166,87 @@ class CustomerPackage(models.Model):
 
     def __str__(self):
         return f"{self.customer} - {self.savings_package}"
+
+class ContributionRequest(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+
+    tenant = models.ForeignKey(
+        "tenants.Tenant",
+        on_delete=models.CASCADE,
+        related_name="contribution_requests"
+    )
+
+    customer = models.ForeignKey(
+        "customers.Customer",
+        on_delete=models.CASCADE,
+        related_name="contributions"
+    )
+
+    customer_package = models.ForeignKey(
+        "services.CustomerPackage",
+        on_delete=models.CASCADE,
+        related_name="contributions"
+    )
+
+    amount = models.DecimalField(max_digits=12, decimal_places=2)
+
+    class PaymentMethod(models.TextChoices):
+        MANUAL = "manual", "Manual"
+        TRANSFER = "transfer", "Transfer"
+        POS = "pos", "POS"
+        USSD = "ussd", "USSD"
+        ONLINE = "online", "Online"
+        OTHER = "other", "Other"
+
+    payment_method = models.CharField(
+        max_length=20,
+        choices=PaymentMethod.choices
+    )
+
+    class Status(models.TextChoices):
+        PENDING = "pending", "Pending"
+        CONFIRMED = "confirmed", "Confirmed"
+        CANCELLED = "cancelled", "Cancelled"
+
+    status = models.CharField(
+        max_length=20,
+        choices=Status.choices,
+        default=Status.PENDING
+    )
+
+    notes = models.TextField(blank=True, null=True)
+
+    reference = models.CharField(max_length=100, unique=True)
+
+    recorded_by = models.ForeignKey(
+        "accounts.User",
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name="recorded_contributions"
+    )
+
+    approved_by = models.ForeignKey(
+        "accounts.User",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="approved_contributions"
+    )
+
+    confirmed_at = models.DateTimeField(null=True, blank=True)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=["tenant"]),
+            models.Index(fields=["customer"]),
+            models.Index(fields=["customer_package"]),
+            models.Index(fields=["status"]),
+            models.Index(fields=["reference"]),
+            models.Index(fields=["tenant", "status"]),
+        ]
+
+    def __str__(self):
+        return f"{self.customer} - {self.amount}"
+
