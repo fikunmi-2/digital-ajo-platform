@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'financials',
     'tenants',
     'services',
+    'rest_framework',
 ]
 
 MIDDLEWARE = [
