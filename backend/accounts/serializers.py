@@ -1,6 +1,7 @@
 from django.contrib.admindocs.utils import ROLES
 from rest_framework import serializers
 from .models import User
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 class UserCreateSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
@@ -48,3 +49,15 @@ class UserCreateSerializer(serializers.ModelSerializer):
         user.save()
 
         return user
+
+class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
+    @classmethod
+    def get_token(cls, user):
+        token = super().get_token(user)
+
+        # Adding Custom Claims
+        token["user_id"] = str(user.id)
+        token["role"] = user.role
+        token["tenant"] = str(user.tenant) if user.tenant else None
+
+        return token
