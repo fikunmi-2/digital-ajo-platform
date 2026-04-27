@@ -118,6 +118,9 @@ SIMPLE_JWT = {
 
     "USER_ID_FIELD": "id",
     "USER_ID_CLAIM": "user_id",
+
+    "ROTATE_REFRESH_TOKENS": True,
+    "BLACKLIST_AFTER_ROTATION": True,
 }
 
 # Password validation

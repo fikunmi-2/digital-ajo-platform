@@ -53,4 +53,20 @@ class CustomTokenRefreshView(TokenRefreshView):
 
         serializer.is_valid(raise_exception=True)
 
-        return Response(serializer.validated_data, status=status.HTTP_200_OK)
+        access = serializer.validated_data.get('access')
+        refresh_new = serializer.validated_data.get('refresh')
+
+        response = Response({'access': access,}, status=status.HTTP_200_OK)
+
+        # Setting new refresh token in cookie
+
+        response.set_cookie(
+            key="refresh_token",
+            value=refresh_new,
+            httponly=True,
+            secure=settings.DEBUG is False,
+            samesite="Lax",
+            path="/api/auth/refresh/",
+        )
+
+        return response
