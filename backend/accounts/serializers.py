@@ -58,6 +58,6 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         # Adding Custom Claims
         token["user_id"] = str(user.id)
         token["role"] = user.role
-        token["tenant"] = str(user.tenant) if user.tenant else None
+        token["tenant_id"] = str(user.tenant_id if user.tenant_id else None)
 
         return token

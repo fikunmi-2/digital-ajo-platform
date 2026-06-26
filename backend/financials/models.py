@@ -94,7 +94,9 @@ class AuditLog(models.Model):
     tenant = models.ForeignKey(
         "tenants.Tenant",
         on_delete=models.CASCADE,
-        related_name="audit_logs"
+        related_name="audit_logs",
+        null=True,
+        blank=True
     )
 
     user = models.ForeignKey(

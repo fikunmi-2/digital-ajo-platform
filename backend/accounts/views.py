@@ -1,7 +1,12 @@
-from rest_framework import status
+from tokenize import TokenError
+
+from rest_framework import status, permissions
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
 from rest_framework_simplejwt.serializers import TokenRefreshSerializer
+from rest_framework_simplejwt.tokens import RefreshToken
 
 from .models import User
 from .serializers import UserCreateSerializer, CustomTokenObtainPairSerializer
@@ -38,6 +43,28 @@ class CustomTokenObtainPairView(TokenObtainPairView):
 
         return response
 
+class LogoutView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        refresh_token = request.COOKIES.get('refresh_token')
+
+        response = Response(
+            {"detail": "Logged out successfully"},
+            status=status.HTTP_200_OK)
+
+        if refresh_token:
+            try:
+                token = RefreshToken(refresh_token)
+                token.blacklist()
+            except TokenError:
+                pass
+
+        response.delete_cookie(key="refresh_token",
+                               path="/api/auth/refresh/",)
+
+        return response
+
 class CustomTokenRefreshView(TokenRefreshView):
 
     def post(self, request, *args, **kwargs):
@@ -70,3 +97,17 @@ class CustomTokenRefreshView(TokenRefreshView):
         )
 
         return response
+
+class MeView(APIView):
+    permissions_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+
+        return Response({
+            "id": str(user.id),
+            "email": user.email,
+            "role": user.role,
+            "tenant_id": str(user.tenant_id if user.tenant_id else None),
+            "tenant_name": user.tenant if user.tenant else None,
+        })
