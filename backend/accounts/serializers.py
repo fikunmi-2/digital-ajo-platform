@@ -39,6 +39,22 @@ class PlatformAdminSerializer(serializers.ModelSerializer):
 
         return user
 
+    def update(self, instance, validated_data):
+        password = validated_data.pop('password', None)
+
+        if "email" in validated_data:
+            instance.email = validated_data["email"]
+
+        instance.role = User.Role.PLATFORM_ADMIN
+        instance.tenant = None
+
+        if password:
+            instance.set_password(password)
+
+        instance.save()
+
+        return instance
+
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod
     def get_token(cls, user):
