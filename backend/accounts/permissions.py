@@ -113,7 +113,7 @@ class IsSameTenantObject(BasePermission):
         if not user.tenant_id:
             return False
 
-        if hasattr(obj, "tenant"):
+        if hasattr(obj, "tenant_id"):
             return obj.tenant_id == user.tenant_id
 
         # Fallback for objects connected through customer.
