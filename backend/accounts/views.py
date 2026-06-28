@@ -1,7 +1,7 @@
 from tokenize import TokenError
 
 from rest_framework import status, permissions
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
@@ -38,7 +38,7 @@ class CustomTokenObtainPairView(TokenObtainPairView):
             httponly=True,
             secure=settings.DEBUG is False,
             samesite="Lax",
-            path="/api/auth/refresh/",
+            path="/api/auth/",
         )
 
         return response
@@ -66,7 +66,7 @@ class LogoutView(APIView):
         return response
 
 class CustomTokenRefreshView(TokenRefreshView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
 
     def post(self, request, *args, **kwargs):
         refresh_token = request.COOKIES.get('refresh_token')

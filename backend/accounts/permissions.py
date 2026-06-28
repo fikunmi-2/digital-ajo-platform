@@ -80,3 +80,59 @@ class IsPlatformAdminOrTenantAdmin(BasePermission):
                 request.user.role == "tenant_admin"
                 and request.user.tenant_id is not None
         )
+
+class IsSameTenantObject(BasePermission):
+    """
+    Object-level permission.
+    Ensures tenants can only access objects belonging to their tenant.
+    """
+
+    def has_object_permission(self, request, view, obj):
+        user = request.user
+
+        if not user or not user.is_authenticated:
+            return False
+
+        if user.role == "platform_admin":
+            return True
+
+        if not user.tenant_id:
+            return False
+
+        if hasattr(obj, "tenant"):
+            return obj.tenant_id == user.tenant_id
+
+        # Fallback for objects connected through customer.
+        if hasattr(obj, "customer") and hasattr(obj.customer, "tenant_id"):
+            return obj.customer.tenant_id == user.tenant_id
+
+        # Fallback for customer package-like objects.
+        if hasattr(obj, "customer_package") and hasattr(obj.customer_package, "tenant_id"):
+            return obj.customer_package.tenant_id == user.tenant_id
+
+        return False
+
+class IsCustomerOwner(BasePermission):
+    """
+    Allows a customer to access only their own customer-related objects.
+    """
+
+    def has_object_permission(self, request, view, obj):
+        user = request.user
+
+        if not user or not user.is_authenticated:
+            return False
+
+        if user.role != "customer":
+            return False
+
+        # Customer object itself
+        if hasattr(obj, "user_id"):
+            return obj.user_id == user.id
+
+        # Objects related to customer:
+        # CustomerPackage, ContributionRequest, WithdrawalRequest, Transaction
+        if hasattr(obj, "customer") and hasattr(obj.customer, "user_id"):
+            return obj.customer.user_id == user.id
+
+        return False
