@@ -3,8 +3,8 @@ from rest_framework import serializers
 from .models import User
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
-class UserCreateSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(write_only=True)
+class PlatformAdminSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(write_only=True, min_length=8)
 
     class Meta:
         model = User
@@ -13,38 +13,27 @@ class UserCreateSerializer(serializers.ModelSerializer):
             "email",
             "password",
             "tenant",
-            "role"
+            "role",
+            "created_at",
+            "updated_at",
         ]
 
-        read_only_fields = ["id"]
-
-    def validate(self, data):
-        role = data.get('role')
-        tenant = data.get('tenant')
-
-        is_platform_admin = role == "platform_admin"
-
-        print("Role: ", role)
-
-        # Enforcing that Users that are not platform admin must belong to
-        # a tenant
-
-        if not is_platform_admin and not tenant:
-            raise serializers.ValidationError(
-                "Users must belong to a tenant (company)"
-            )
-
-        if is_platform_admin and tenant:
-            raise serializers.ValidationError(
-                "Platform admins cannot belong to a tenant (company)"
-            )
-
-        return data
+        read_only_fields = [
+            "id",
+            "role",
+            "tenant",
+            "created_at",
+            "updated_at",
+        ]
 
     def create(self, validated_data):
         password = validated_data.pop('password')
 
-        user = User(**validated_data)
+        user = User(
+            email=validated_data['email'],
+            role=User.Role.PLATFORM_ADMIN,
+            tenant=None
+        )
         user.set_password(password)
         user.save()
 

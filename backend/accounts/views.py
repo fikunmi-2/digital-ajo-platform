@@ -9,16 +9,23 @@ from rest_framework_simplejwt.serializers import TokenRefreshSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from .models import User
-from .serializers import UserCreateSerializer, CustomTokenObtainPairSerializer
+from .permissions import IsPlatformAdmin
+from .serializers import CustomTokenObtainPairSerializer, PlatformAdminSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from django.conf import settings
 
-class UserViewSet(ModelViewSet):
-    queryset = User.objects.all()
-    serializer_class = UserCreateSerializer
+REFRESH_COOKIE_PATH = "/api/auth/"
+REFRESH_COOKIE_MAX_AGE = 24 * 60 * 60 # 1 day
+
+class PlatformAdminViewSet(ModelViewSet):
+    queryset = User.objects.filter(role=User.Role.PLATFORM_ADMIN)
+    serializer_class = PlatformAdminSerializer
+
+    permission_classes = [IsPlatformAdmin]
 
 class CustomTokenObtainPairView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
+    permission_classes = [AllowAny]
 
     def post(self, request, *args, **kwargs):
         response = super().post(request, *args, **kwargs)
@@ -36,15 +43,16 @@ class CustomTokenObtainPairView(TokenObtainPairView):
             key="refresh_token",
             value=refresh,
             httponly=True,
-            secure=settings.DEBUG is False,
+            secure=not settings.DEBUG,
             samesite="Lax",
-            path="/api/auth/",
+            path=REFRESH_COOKIE_PATH,
+            max_age=REFRESH_COOKIE_MAX_AGE,
         )
 
         return response
 
 class LogoutView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
 
     def post(self, request):
         refresh_token = request.COOKIES.get('refresh_token')
@@ -61,7 +69,7 @@ class LogoutView(APIView):
                 pass
 
         response.delete_cookie(key="refresh_token",
-                               path="/api/auth/refresh/",)
+                               path=REFRESH_COOKIE_PATH,)
 
         return response
 
@@ -88,19 +96,21 @@ class CustomTokenRefreshView(TokenRefreshView):
 
         # Setting new refresh token in cookie
 
-        response.set_cookie(
-            key="refresh_token",
-            value=refresh_new,
-            httponly=True,
-            secure=settings.DEBUG is False,
-            samesite="Lax",
-            path="/api/auth/refresh/",
-        )
+        if refresh_new:
+            response.set_cookie(
+                key="refresh_token",
+                value=refresh_new,
+                httponly=True,
+                secure=not settings.DEBUG,
+                samesite="Lax",
+                path=REFRESH_COOKIE_PATH,
+                max_age=REFRESH_COOKIE_MAX_AGE,
+            )
 
         return response
 
 class MeView(APIView):
-    permissions_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request):
         user = request.user
@@ -109,6 +119,6 @@ class MeView(APIView):
             "id": str(user.id),
             "email": user.email,
             "role": user.role,
-            "tenant_id": str(user.tenant_id if user.tenant_id else None),
-            "tenant_name": user.tenant if user.tenant else None,
+            "tenant_id": str(user.tenant_id) if user.tenant_id else None,
+            "tenant_name": user.tenant.name if user.tenant else None,
         })

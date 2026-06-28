@@ -16,7 +16,7 @@ Including another URLconf
 """
 from rest_framework.routers import DefaultRouter
 from accounts.views import (
-    UserViewSet,
+    PlatformAdminViewSet,
     CustomTokenObtainPairView,
     CustomTokenRefreshView,
     LogoutView,
@@ -26,13 +26,14 @@ from django.urls import path, include
 from django.contrib import admin
 
 router = DefaultRouter()
-router.register(r'users', UserViewSet, basename='users')
+router.register(r'platform-admins', PlatformAdminViewSet, basename='platform-admins')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include(router.urls)),
+
     path('api/auth/login/', CustomTokenObtainPairView.as_view(), name='login'),
     path('api/auth/logout/', LogoutView.as_view(), name='logout'),
     path('api/auth/refresh/', CustomTokenRefreshView.as_view(), name='token_refresh'),
-    path('api/auth/refresh/', MeView.as_view(), name='me'),
+    path('api/auth/me/', MeView.as_view(), name='me'),
 ]
