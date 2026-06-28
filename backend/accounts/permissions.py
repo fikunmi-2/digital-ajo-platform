@@ -35,6 +35,7 @@ class IsAgent(BasePermission):
             request.user
             and request.user.is_authenticated
             and request.user.role == "agent"
+            and request.user.tenant_id is not None
         )
 
 class IsCustomer(BasePermission):
@@ -79,6 +80,19 @@ class IsPlatformAdminOrTenantAdmin(BasePermission):
         return (
                 request.user.role == "tenant_admin"
                 and request.user.tenant_id is not None
+        )
+
+class IsTenantAdminOrCustomer(BasePermission):
+    """
+    Allows access to tenant admins and customers.
+    """
+
+    def has_permission(self, request, view):
+        return (
+            request.user
+            and request.user.is_authenticated
+            and request.user.role in ["tenant_admin", "customer"]
+            and request.user.tenant_id is not None
         )
 
 class IsSameTenantObject(BasePermission):
