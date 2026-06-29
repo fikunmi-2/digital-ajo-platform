@@ -17,7 +17,7 @@ Including another URLconf
 from django.conf import settings
 from django.conf.urls.static import static
 from rest_framework.routers import DefaultRouter
-from backend.accounts.views import (
+from accounts.views import (
     PlatformAdminViewSet,
     CustomTokenObtainPairView,
     CustomTokenRefreshView,
@@ -27,7 +27,7 @@ from backend.accounts.views import (
 from django.urls import path, include
 from django.contrib import admin
 
-from backend.tenants.views import TenantViewSet
+from tenants.views import TenantViewSet
 
 router = DefaultRouter()
 router.register(r'platform-admins', PlatformAdminViewSet, basename='platform-admins')

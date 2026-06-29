@@ -4,7 +4,7 @@ from rest_framework.response import Response
 
 from .models import Tenant
 from .serializers import TenantSerializer
-from ..accounts.permissions import IsPlatformAdmin
+from accounts.permissions import IsPlatformAdmin
 
 
 class TenantViewSet(viewsets.ModelViewSet):
@@ -14,6 +14,14 @@ class TenantViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(created_by=self.request.user)
+
+    def destroy(self, request, *args, **kwargs):
+        return Response(
+            {
+                "detail": "Tenants cannot be deleted, Use deactivate or suspend instead.",
+            },
+            status=status.HTTP_405_METHOD_NOT_ALLOWED,
+        )
 
     @action(detail=True, methods=['post'])
     def activate(self, request, pk=None):
