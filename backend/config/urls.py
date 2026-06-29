@@ -32,9 +32,12 @@ from tenants.views import (
     # TenantOnboarding
 )
 
+from backend.accounts.views import UserViewSet
+
 router = DefaultRouter()
 router.register(r'platform-admins', PlatformAdminViewSet, basename='platform-admins')
 router.register("tenants", TenantViewSet, basename='tenants')
+router.register("users", UserViewSet, basename='users')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
