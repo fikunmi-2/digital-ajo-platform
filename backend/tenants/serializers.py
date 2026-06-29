@@ -1,5 +1,10 @@
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError as DjangoValidationError
+from django.db import transaction
 from rest_framework import serializers
 from .models import Tenant
+from accounts.models import User
+
 
 class TenantSerializer(serializers.ModelSerializer):
     created_by_email = serializers.EmailField(
@@ -88,3 +93,70 @@ class TenantSerializer(serializers.ModelSerializer):
             )
 
         return value
+
+class TenantAdminInputSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    password = serializers.CharField(write_only=True, min_length=8)
+
+    def validate_email(self, value):
+        value = value.strip().lower()
+
+        if User.objects.filter(email=value).exits():
+            raise serializers.ValidationError(
+                "A user with this email already exists."
+            )
+
+        return value
+
+    def validate_password(self, value):
+        try:
+            validate_password(value)
+        except DjangoValidationError as error:
+            raise serializers.ValidationError(list(error.messages))
+
+        return value
+
+class TenantOnboardingSerializer(serializers.Serializer):
+    tenant = TenantSerializer()
+    admin = TenantAdminInputSerializer(write_only=True)
+
+    @transaction.atomic
+    def create(self, validated_data):
+        request = self.context["request"]
+
+        tenant_data = validated_data.pop("tenant")
+        admin_data = validated_data.pop("admin")
+
+        tenant = Tenant.objects.create(
+            created_by=request.user,
+            **tenant_data
+        )
+
+        tenant_admin = User(
+            email=admin_data["email"],
+            role=User.Role.TENANT_ADMIN,
+            tenant=tenant,
+            is_staff=False,
+            is_superuser=False,
+        )
+
+        tenant_admin.set_password(admin_data["password"])
+        tenant_admin.save()
+
+        return {
+            "tenant": tenant,
+            "admin": tenant_admin,
+        }
+    def to_representation(self, instance):
+        tenant = instance["tenant"]
+        admin = instance["admin"]
+
+        return {
+            "tenant": TenantSerializer(tenant, context=self.context).data,
+            "admin": {
+                "id": str(admin.id),
+                "email": admin.email,
+                "role": admin.role,
+                "tenant_id": str(admin.tenant_id),
+            },
+        }
