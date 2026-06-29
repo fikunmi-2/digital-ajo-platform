@@ -27,7 +27,10 @@ from accounts.views import (
 from django.urls import path, include
 from django.contrib import admin
 
-from tenants.views import TenantViewSet
+from tenants.views import (
+    TenantViewSet,
+    TenantOnboarding
+)
 
 router = DefaultRouter()
 router.register(r'platform-admins', PlatformAdminViewSet, basename='platform-admins')
@@ -41,6 +44,8 @@ urlpatterns = [
     path('api/auth/logout/', LogoutView.as_view(), name='logout'),
     path('api/auth/refresh/', CustomTokenRefreshView.as_view(), name='token_refresh'),
     path('api/auth/me/', MeView.as_view(), name='me'),
+
+    path('api/tenant-onboarding/', TenantOnboarding.as_view(), name='tenant_onboarding'),
 ]
 
 if settings.DEBUG:

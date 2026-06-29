@@ -1,9 +1,9 @@
 from rest_framework.decorators import action
-from rest_framework import viewsets, status
+from rest_framework import viewsets, status, generics
 from rest_framework.response import Response
 
 from .models import Tenant
-from .serializers import TenantSerializer
+from .serializers import TenantSerializer, TenantOnboardingSerializer
 from accounts.permissions import IsPlatformAdmin
 
 
@@ -49,4 +49,8 @@ class TenantViewSet(viewsets.ModelViewSet):
 
         serializer = self.get_serializer(tenant)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+class TenantOnboarding(generics.CreateAPIView):
+    serializer_class = TenantOnboardingSerializer
+    permission_classes = [IsPlatformAdmin]
 
