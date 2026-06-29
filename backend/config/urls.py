@@ -29,7 +29,7 @@ from django.contrib import admin
 
 from tenants.views import (
     TenantViewSet,
-    TenantOnboarding
+    # TenantOnboarding
 )
 
 router = DefaultRouter()
@@ -45,7 +45,7 @@ urlpatterns = [
     path('api/auth/refresh/', CustomTokenRefreshView.as_view(), name='token_refresh'),
     path('api/auth/me/', MeView.as_view(), name='me'),
 
-    path('api/tenant-onboarding/', TenantOnboarding.as_view(), name='tenant_onboarding'),
+    # path('api/tenant-onboarding/', TenantOnboarding.as_view(), name='tenant_onboarding'),
 ]
 
 if settings.DEBUG:

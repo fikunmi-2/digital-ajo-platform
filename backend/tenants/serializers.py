@@ -101,7 +101,7 @@ class TenantAdminInputSerializer(serializers.Serializer):
     def validate_email(self, value):
         value = value.strip().lower()
 
-        if User.objects.filter(email=value).exits():
+        if User.objects.filter(email=value).exists():
             raise serializers.ValidationError(
                 "A user with this email already exists."
             )
