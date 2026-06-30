@@ -22,7 +22,8 @@ from accounts.views import (
     CustomTokenObtainPairView,
     CustomTokenRefreshView,
     LogoutView,
-    MeView
+    MeView,
+    UserViewSet
 )
 from django.urls import path, include
 from django.contrib import admin
@@ -31,8 +32,6 @@ from tenants.views import (
     TenantViewSet,
     # TenantOnboarding
 )
-
-from backend.accounts.views import UserViewSet
 
 router = DefaultRouter()
 router.register(r'platform-admins', PlatformAdminViewSet, basename='platform-admins')

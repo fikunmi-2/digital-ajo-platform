@@ -224,49 +224,49 @@ class UserViewSet(
             serializer.save()
             return
 
-        @action(detail=True, methods=["post"])
-        def activate(self, request, pk=None):
-            user = self.get_object()
-            self._set_active_status(user=user, is_active=True)
+    @action(detail=True, methods=["post"])
+    def activate(self, request, pk=None):
+        user = self.get_object()
+        self._set_active_status(user=user, is_active=True)
 
-            serializer = self.get_serializer(user)
-            return Response(serializer.data, status=status.HTTP_200_OK)
+        serializer = self.get_serializer(user)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
-        @action(detail=True, methods=["post"])
-        def deactivate(self, request, pk=None):
-            user = self.get_object()
-            self._set_active_status(user=user, is_active=False)
+    @action(detail=True, methods=["post"])
+    def deactivate(self, request, pk=None):
+        user = self.get_object()
+        self._set_active_status(user=user, is_active=False)
 
-            serializer = self.get_serializer(user)
-            return Response(serializer.data, status=status.HTTP_200_OK)
+        serializer = self.get_serializer(user)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
-        def _set_active_status(self, user, is_active):
-            actor = self.request.user
+    def _set_active_status(self, user, is_active):
+        actor = self.request.user
 
-            if user.role == "platform_admin":
+        if user.role == "platform_admin":
+            raise PermissionDenied(
+                "Platform admin accounts must be managed through the platform admin endpoint."
+            )
+
+        if actor.role == "platform_admin":
+            user.is_active = is_active
+            user.save(update_fields=["is_active"])
+            return
+
+        if actor.role == "tenant_admin":
+            if user.tenant_id != actor.tenant_id:
+                raise PermissionDenied("You cannot manage users outside your tenant.")
+
+            if user.role != "customer":
                 raise PermissionDenied(
-                    "Platform admin accounts must be managed through the platform admin endpoint."
+                    "Tenant admins can only activate or deactivate customer accounts."
                 )
 
-            if actor.role == "platform_admin":
-                user.is_active = is_active
-                user.save(update_fields=["is_active"])
-                return
+            user.is_active = is_active
+            user.save(update_fields=["is_active"])
+            return
 
-            if actor.role == "tenant_admin":
-                if user.tenant_id != actor.tenant_id:
-                    raise PermissionDenied("You cannot manage users outside your tenant.")
-
-                if user.role != "customer":
-                    raise PermissionDenied(
-                        "Tenant admins can only activate or deactivate customer accounts."
-                    )
-
-                user.is_active = is_active
-                user.save(update_fields=["is_active"])
-                return
-
-            raise PermissionDenied("You do not have permission to change this account status.")
+        raise PermissionDenied("You do not have permission to change this account status.")
 
 
 

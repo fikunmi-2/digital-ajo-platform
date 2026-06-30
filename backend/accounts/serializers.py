@@ -71,6 +71,8 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
 # User = get_user_model()
 
 class UserAccountSerializer(serializers.ModelSerializer):
+    tenant_name = serializers.SerializerMethodField()
+
     class Meta:
         model = User
         fields = [
@@ -93,6 +95,11 @@ class UserAccountSerializer(serializers.ModelSerializer):
             "created_at",
             "updated_at",
         ]
+
+    def get_tenant_name(self, obj):
+        if obj.tenant:
+            return obj.tenant.name
+        return None
 
 class UserAccountUpdateSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, min_length=8, required=False)
