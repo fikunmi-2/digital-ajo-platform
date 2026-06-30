@@ -35,6 +35,7 @@ class Customer(models.Model):
     date_joined = models.DateTimeField()
     address = models.CharField(max_length=255)
     date_of_birth = models.DateField()
+    phone = models.CharField(max_length=13)
 
     profile_picture = models.ImageField(
         upload_to="customer_profiles/",
