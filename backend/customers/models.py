@@ -2,6 +2,7 @@
 
 import uuid
 from django.db import models
+from django.utils import timezone
 
 
 class Customer(models.Model):
@@ -32,7 +33,7 @@ class Customer(models.Model):
     # Personal Info
     surname = models.CharField(max_length=100)
     first_name = models.CharField(max_length=100)
-    date_joined = models.DateTimeField()
+    date_joined = models.DateTimeField(default=timezone.now)
     address = models.CharField(max_length=255)
     date_of_birth = models.DateField()
     phone = models.CharField(max_length=13)
@@ -90,6 +91,7 @@ class Customer(models.Model):
             models.Index(fields=["agent"]),
             models.Index(fields=["status"]),
             models.Index(fields=["tenant", "status"]),
+            models.Index(fields=["tenant", "phone"]),
         ]
 
     def __str__(self):
