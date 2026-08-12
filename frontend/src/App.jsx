@@ -1,120 +1,149 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+// import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+
+// // Layout
+// import AppLayout from './components/layout/AppLayout'
+
+// // Auth
+// import Login from './pages/auth/Login'
+
+// // Ajo Runner Pages
+// import Dashboard from './pages/dashboard/Dashboard'
+// import CustomerList from './pages/customers/CustomerList'
+// import AddCustomer from './pages/customers/AddCustomer'
+// import CustomerProfile from './pages/customers/CustomerProfile'
+// import PackageList from './pages/packages/PackageList'
+// import CreatePackage from './pages/packages/CreatePackage'
+// import ContributionList from './pages/contributions/ContributionList'
+// import RecordContribution from './pages/contributions/RecordContribution'
+// import Withdrawals from './pages/withdrawals/Withdrawals'
+// import AgentList from './pages/agents/AgentList'
+// import Reports from './pages/reports/Reports'
+
+// // Customer Portal
+// import CustomerDashboard from './pages/customer-portal/CustomerDashboard'
+
+// // Platform Admin
+// import TenantManagement from './pages/admin/TenantManagement'
+
+// function App() {
+//   return (
+//     <BrowserRouter>
+//       <Routes>
+
+//         {/* Default */}
+//         <Route path="/" element={<Navigate to="/login" />} />
+
+//         {/* Auth - no layout */}
+//         <Route path="/login" element={<Login />} />
+
+//         {/* Ajo Runner - with layout */}
+//         <Route element={<AppLayout role="runner" />}>
+//           <Route path="/dashboard" element={<Dashboard />} />
+//           <Route path="/customers" element={<CustomerList />} />
+//           <Route path="/customers/add" element={<AddCustomer />} />
+//           <Route path="/customers/:id" element={<CustomerProfile />} />
+//           <Route path="/packages" element={<PackageList />} />
+//           <Route path="/packages/create" element={<CreatePackage />} />
+//           <Route path="/contributions" element={<ContributionList />} />
+//           <Route path="/contributions/record" element={<RecordContribution />} />
+//           <Route path="/withdrawals" element={<Withdrawals />} />
+//           <Route path="/agents" element={<AgentList />} />
+//           <Route path="/reports" element={<Reports />} />
+//         </Route>
+
+//         {/* Customer Portal */}
+//         <Route element={<AppLayout role="customer" />}>
+//           <Route path="/portal" element={<CustomerDashboard />} />
+//         </Route>
+
+//         {/* Platform Admin */}
+//         <Route element={<AppLayout role="admin" />}>
+//           <Route path="/admin" element={<TenantManagement />} />
+//         </Route>
+
+//       </Routes>
+//     </BrowserRouter>
+//   )
+// }
+
+// export default App
+
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { useEffect } from 'react'
+
+// Layout
+import AppLayout from './components/layout/AppLayout'
+
+// Auth
+import Login from './pages/auth/Login'
+
+// Ajo Runner Pages
+import Dashboard from './pages/dashboard/Dashboard'
+import CustomerList from './pages/customers/CustomerList'
+import AddCustomer from './pages/customers/AddCustomer'
+import CustomerProfile from './pages/customers/CustomerProfile'
+import PackageList from './pages/packages/PackageList'
+import CreatePackage from './pages/packages/CreatePackage'
+import ContributionList from './pages/contributions/ContributionList'
+import RecordContribution from './pages/contributions/RecordContribution'
+import Withdrawals from './pages/withdrawals/Withdrawals'
+import AgentList from './pages/agents/AgentList'
+import Reports from './pages/reports/Reports'
+import Settings from './pages/settings/Settings'
+
+
+
+// Customer Portal
+import CustomerDashboard from './pages/customer-portal/CustomerDashboard'
+
+// Platform Admin
+import TenantManagement from './pages/admin/TenantManagement'
+import AddTenant from './pages/admin/AddTenant'
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+    <BrowserRouter>
+      <Routes>
 
-      <div className="ticks"></div>
+        {/* Default */}
+        <Route path="/" element={<Navigate to="/login" />} />
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
+        {/* Auth - no layout */}
+        <Route path="/login" element={<Login />} />
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
+        {/* Ajo Runner - with layout */}
+        <Route element={<AppLayout role="runner" />}>
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/customers" element={<CustomerList />} />
+          <Route path="/customers/add" element={<AddCustomer />} />
+          <Route path="/customers/:id" element={<CustomerProfile />} />
+          <Route path="/packages" element={<PackageList />} />
+          <Route path="/packages/create" element={<CreatePackage />} />
+          <Route path="/contributions" element={<ContributionList />} />
+          <Route path="/contributions/record"
+            element={<RecordContribution />} />
+          <Route path="/withdrawals" element={<Withdrawals />} />
+          <Route path="/agents" element={<AgentList />} />
+          <Route path="/reports" element={<Reports />} />
+          <Route path="/settings" element={<Settings />} />
+        </Route>
+
+        {/* Customer Portal */}
+        <Route element={<AppLayout role="customer" />}>
+          <Route path="/portal" element={<CustomerDashboard />} />
+        </Route>
+
+        {/* Platform Admin */}
+        <Route element={<AppLayout role="admin" />}>
+          <Route path="/admin" element={<TenantManagement />} />
+          <Route path="/admin/tenant" element={<AddTenant />} />
+        </Route>
+
+        {/* Catch all - redirect to login */}
+        <Route path="*" element={<Navigate to="/login" />} />
+
+      </Routes>
+    </BrowserRouter>
   )
 }
 

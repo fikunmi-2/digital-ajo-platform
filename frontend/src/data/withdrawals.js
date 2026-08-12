@@ -1,0 +1,72 @@
+export const withdrawals = [
+  {
+    id: "1",
+    customer_id: "1",
+    customer_name: "Adaeze Okonkwo",
+    customer_initials: "AO",
+    package: "Daily Savings",
+    amount: 50000,
+    status: "Pending",
+    reference: "REF-W00123",
+    requested_at: "2025-03-21",
+    processed_at: null,
+    processed_by: null,
+    notes: ""
+  },
+  {
+    id: "2",
+    customer_id: "2",
+    customer_name: "Kunle Adeyemi",
+    customer_initials: "KA",
+    package: "Monthly Thrift",
+    amount: 25000,
+    status: "Pending",
+    reference: "REF-W00122",
+    requested_at: "2025-03-20",
+    processed_at: null,
+    processed_by: null,
+    notes: ""
+  },
+  {
+    id: "3",
+    customer_id: "4",
+    customer_name: "Ngozi Eze",
+    customer_initials: "NE",
+    package: "Flexible Plan",
+    amount: 100000,
+    status: "Pending",
+    reference: "REF-W00121",
+    requested_at: "2025-03-19",
+    processed_at: null,
+    processed_by: null,
+    notes: ""
+  },
+  {
+    id: "4",
+    customer_id: "5",
+    customer_name: "Bisi Ibrahim",
+    customer_initials: "BI",
+    package: "Daily Savings",
+    amount: 30000,
+    status: "Approved",
+    reference: "REF-W00120",
+    requested_at: "2025-03-18",
+    processed_at: "2025-03-18",
+    processed_by: "Pec Concepts",
+    notes: ""
+  },
+  {
+    id: "5",
+    customer_id: "3",
+    customer_name: "Tunde Bello",
+    customer_initials: "TB",
+    package: "Daily Savings",
+    amount: 15000,
+    status: "Rejected",
+    reference: "REF-W00119",
+    requested_at: "2025-03-17",
+    processed_at: "2025-03-17",
+    processed_by: "Pec Concepts",
+    notes: "Insufficient balance"
+  }
+]
