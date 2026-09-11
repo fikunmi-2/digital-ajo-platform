@@ -18,9 +18,9 @@ def validate_ngn_phone(value):
             "Phone number must contain digits only."
         )
 
-    if not value.isdigit():
+    if not value.startswith("234"):
         raise serializers.ValidationError(
-            "Phone number must start with 234."
+            "Phone number must start with '234'."
         )
 
     if len(value) != 13:
@@ -40,14 +40,13 @@ def validate_nin(value):
 
     if len(value) != 11:
         raise serializers.ValidationError(
-            "NIN number must contain exactly 11 digits."
+            "NIN number must be exactly 11 digits."
         )
 
     return value
 
 def validate_profile_picture(value):
-
-    max_image_size = 2 * 1024 * 1024
+    max_image_size = 2 * 1024 * 1024 #2MB
     allowed_image_types = ["image/jpeg", "image/png", "image/webp"]
 
     if not value:
@@ -68,6 +67,9 @@ def validate_profile_picture(value):
     return value
 
 class CustomerUserInputSerializer(serializers.Serializer):
+    """
+    Handles email/password for the customer login account
+    """
     email = serializers.EmailField()
     password = serializers.CharField(write_only=True, min_length=8)
 
@@ -81,16 +83,20 @@ class CustomerUserInputSerializer(serializers.Serializer):
 
     def validate_password(self, value):
 
+        # An already existing password validator
         validate_password(value)
         return value
 
 class CustomerSerializer(serializers.Serializer):
+    """
+    Handles normal output/list/retrieve response
+    """
     user_id = serializers.UUIDField(source="user.id", read_only=True)
     email = serializers.EmailField(source="user.email", read_only=True)
     is_active = serializers.BooleanField(source="user.is_active", read_only=True)
 
-    tenant_id = serializers.UUIDField(source="user.tenant_id", read_only=True)
-    tenant_name = serializers.CharField(source="user.tenant_name", read_only=True)
+    tenant_id = serializers.UUIDField(source="tenant_id", read_only=True)
+    tenant_name = serializers.CharField(source="tenant_name", read_only=True)
 
     class Meta:
         model = Customer
